@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "name": "Coffee",
+    "price": 3.5
+  },
+  {
+    "id": 2,
+    "name": "Tea",
+    "price": 2.0
+  },
+  {
+    "id": 3,
+    "name": "Bread",
+    "price": 1.2
+  },
+  {
+    "id": 4,
+    "name": "Milk",
+    "price": 1.5
+  },
+  {
+    "id": 5,
+    "name": "Eggs",
+    "price": 2.5
+  },
+  {
+    "id": 6,
+    "name": "Cheese",
+    "price": 4.0
+  },
+  {
+    "id": 7,
+    "name": "Butter",
+    "price": 3.0
+  },
+  {
+    "id": 8,
+    "name": "Apples",
+    "price": 1.8
+  },
+  {
+    "id": 9,
+    "name": "Bananas",
+    "price": 1.2
+  },
+  {
+    "id": 10,
+    "name": "Orange Juice",
+    "price": 3.5
+  }
+]
