@@ -13,11 +13,6 @@ export interface SelectedProduct extends BaseProduct {
   totalPrice: number;
 }
 
-export interface EditingProduct {
-  id: number;
-  quantity: number;
-}
-
 export interface Order {
   id: number;
   orderNo: string;

@@ -1,26 +1,30 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { EditingProduct, SelectedProduct } from '../types/types';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  Order,
+  Product,
+  SelectedProduct,
+} from '../types/types';
 import ProductsTable from '../components/ProductsTable';
 import ManageProductModal from '../components/ManageProductModal';
-import products from '../data/products.json';
-import ordersData from '../data/orders.json';
+import {
+  createOrder,
+  editOrder,
+  getOrder,
+  getProducts,
+} from '../services/data';
 
 export default function ManageOrder() {
   const { id } = useParams();
-  const foundOrder = id
-    ? ordersData.find((order) => order.id === Number(id))
-    : null;
+  const [foundOrder, setFoundOrder] = useState<Order | null>(null);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>(
-    foundOrder?.selectedProducts || []
+    []
   );
 
-  const [editingProduct, setEditingProduct] = useState<EditingProduct | null>(
-    null
-  );
+  const [products, setProducts] = useState<Product[]>([]);
 
   const initialProductModalData = {
     productId: 0,
@@ -29,8 +33,10 @@ export default function ManageOrder() {
   const [productModalData, setProductModalData] = useState(
     initialProductModalData
   );
+  const [orderNo, setOrderNo] = useState('');
+  const navigate = useNavigate();
 
-  const getCurrentDate = new Date().toLocaleDateString();
+  const getCurrentDate = foundOrder?.date || new Date().toLocaleDateString();
   const getFinalPrice = (
     selectedProducts
       ? selectedProducts.reduce((val, product) => val + product.totalPrice, 0)
@@ -40,25 +46,38 @@ export default function ManageOrder() {
     ? selectedProducts.reduce((val, product) => val + product.quantity, 0)
     : 0;
 
-  const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
     if (selectedProducts.length === 0) return alert('Add some products first');
     const data = new FormData(evt.currentTarget);
+    if (!data.get('order-no')) return alert('Add the order #');
 
     const dataToSubmit = {
-      orderNo: data.get('order-no'),
+      orderNo: data.get('order-no') as string,
       date: getCurrentDate,
       productsNo: getTotalProducts,
-      finalPrice: getFinalPrice,
+      finalPrice: Number(getFinalPrice),
       selectedProducts,
     };
     if (id) {
-      alert('order edited');
+      //Edit Path
+      const editedOrderResponse = await editOrder(Number(id), dataToSubmit);
+      if (editedOrderResponse) {
+        alert('Order edited');
+        navigate('/my-orders');
+      } else {
+        alert('There was an error editing this order');
+      }
     } else {
-      alert('order created');
+      // Create Path
+      const createdOrderResponse = await createOrder(dataToSubmit);
+      if (createdOrderResponse) {
+        alert('Order created');
+        navigate('/');
+      } else {
+        alert('There was an error creating order');
+      }
     }
-    console.log(dataToSubmit);
-    console.log(JSON.stringify(dataToSubmit));
   };
 
   const handleAddNewProduct = (evt: React.FormEvent<HTMLFormElement>) => {
@@ -74,12 +93,13 @@ export default function ManageOrder() {
       name: product.name,
       unitPrice: product.price,
       quantity: Number(data.get('quantity')),
-      totalPrice: Number(data.get('quantity')) * product.price,
+      totalPrice:
+        Math.round(Number(data.get('quantity')) * product.price * 100) / 100,
     };
 
-    if (editingProduct) {
+    if (productModalData.productId) {
       const newSelectedProducts = selectedProducts.map((product) => {
-        if (product.id === editingProduct.id) {
+        if (product.id === productModalData.productId) {
           return newSelectedProduct;
         }
         return product;
@@ -117,13 +137,13 @@ export default function ManageOrder() {
   };
 
   const handleEditProduct = (product: SelectedProduct) => {
-    setEditingProduct({ id: product.id, quantity: product.quantity });
+    setProductModalData({ productId: product.id, quantity: product.quantity });
     handleOpenModal();
   };
 
   const handleCloseModal = () => {
     setIsOpenModal(false);
-    setEditingProduct(null);
+    setProductModalData(initialProductModalData);
     resetProductDataModal();
   };
 
@@ -135,7 +155,7 @@ export default function ManageOrder() {
     type: 'quantity' | 'product',
     value: string | number
   ) => {
-    console.log(type, value);
+    console.log({ type, value });
     if (type === 'quantity') {
       setProductModalData({ ...productModalData, quantity: Number(value) });
     }
@@ -147,6 +167,26 @@ export default function ManageOrder() {
   const resetProductDataModal = () => {
     setProductModalData(initialProductModalData);
   };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const productsData = await getProducts();
+      setProducts(productsData);
+    };
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    if (id) {
+      const fetchOrder = async () => {
+        const orderData = await getOrder(Number(id));
+        setFoundOrder(orderData);
+        setSelectedProducts(orderData.selectedProducts);
+        setOrderNo(orderData.orderNo);
+      };
+      fetchOrder();
+    }
+  }, [id]);
 
   return (
     <div>
@@ -168,7 +208,7 @@ export default function ManageOrder() {
             name="order-no"
             id="order-no"
             label="Order #"
-            defaultValue={foundOrder?.orderNo || ''}
+            value={orderNo}
             sx={{ display: 'block' }}
           />
           <TextField
@@ -209,12 +249,12 @@ export default function ManageOrder() {
         </Box>
       </div>
       <ManageProductModal
-        editingProduct={editingProduct}
         handleAddNewProduct={handleAddNewProduct}
         handleCloseModal={handleCloseModal}
         isOpenModal={isOpenModal}
         handleChangeProductData={handleChangeProductData}
         productModalData={productModalData}
+        products={products}
       />
     </div>
   );

@@ -11,28 +11,27 @@ import {
   Select,
   TextField,
 } from '@mui/material';
-import { EditingProduct } from '../types/types';
-import products from '../data/products.json';
+import { Product } from '../types/types';
 
 interface Props {
   isOpenModal: boolean;
   handleCloseModal: () => void;
   handleAddNewProduct: (evt: React.FormEvent<HTMLFormElement>) => void;
-  editingProduct: EditingProduct | null;
   productModalData: { quantity: number; productId: number };
   handleChangeProductData: (
     type: 'quantity' | 'product',
     value: string | number
   ) => void;
+  products: Product[];
 }
 
 export default function ManageProductModal({
   isOpenModal,
   handleCloseModal,
   handleAddNewProduct,
-  editingProduct,
   productModalData,
   handleChangeProductData,
+  products,
 }: Props) {
   return (
     <Dialog
@@ -43,7 +42,7 @@ export default function ManageProductModal({
     >
       <Box component="form" onSubmit={handleAddNewProduct}>
         <DialogTitle id="alert-dialog-title">
-          {`${editingProduct ? 'Edit ' : 'Add new'}`} product
+          {`${productModalData.productId ? 'Edit ' : 'Add new'}`} product
         </DialogTitle>
         <DialogContent>
           <FormControl fullWidth sx={{ marginTop: '.5rem' }}>
@@ -53,7 +52,7 @@ export default function ManageProductModal({
               id="product-id"
               name="product-id"
               label="Product"
-              value={editingProduct?.id || productModalData.productId}
+              value={productModalData.productId}
               onChange={(evt) =>
                 handleChangeProductData('product', evt.target.value)
               }
@@ -72,7 +71,7 @@ export default function ManageProductModal({
               id="quantity"
               label="Qty required"
               type="number"
-              value={editingProduct?.quantity || productModalData.quantity}
+              value={productModalData.quantity}
               onChange={(evt) =>
                 handleChangeProductData('quantity', evt.target.value)
               }

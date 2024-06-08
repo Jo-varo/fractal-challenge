@@ -6,7 +6,6 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 function App() {
-
   return (
     <div>
       <Link to="/" className="link-danger link-underline-opacity-50 fs-4">

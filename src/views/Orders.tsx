@@ -7,16 +7,30 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Button } from '@mui/material';
 import { Link } from 'react-router-dom';
-import ordersData from '../data/orders.json';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { deleteOrder, getOrders } from '../services/data';
+import { Order } from '../types/types';
 
 export default function Orders() {
-  const [orders, setOrders] = useState(ordersData);
+  const [orders, setOrders] = useState<Order[]>([]);
 
-  const handleDelete = (id: number) => {
-    const filteredOrders = orders.filter((order) => order.id !== id);
-    setOrders(filteredOrders);
+  const handleDelete =  async (id: number) => {
+    const deleteOrderResponse = await deleteOrder(id)
+    if(deleteOrderResponse){
+      alert('Sucessful deleted')
+      setOrders(orders.filter(order=> order.id !== id))
+    }else{
+      alert('We couldn\'t delete the order')
+    }
   };
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const ordersData = await getOrders();
+      setOrders(ordersData);
+    };
+    fetchOrders();
+  }, []);
 
   return (
     <div>
@@ -45,7 +59,7 @@ export default function Orders() {
                 <TableCell>{order.orderNo}</TableCell>
                 <TableCell>{order.date}</TableCell>
                 <TableCell>{order.productsNo}</TableCell>
-                <TableCell>{order.finalPrice}</TableCell>
+                <TableCell>{order.finalPrice.toFixed(2)}</TableCell>
                 <TableCell sx={{ display: 'flex', gap: '.5rem' }}>
                   <Button
                     component={Link}
