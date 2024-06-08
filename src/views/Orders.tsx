@@ -5,7 +5,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { deleteOrder, getOrders } from '../services/data';
@@ -14,13 +14,13 @@ import { Order } from '../types/types';
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
 
-  const handleDelete =  async (id: number) => {
-    const deleteOrderResponse = await deleteOrder(id)
-    if(deleteOrderResponse){
-      alert('Sucessful deleted')
-      setOrders(orders.filter(order=> order.id !== id))
-    }else{
-      alert('We couldn\'t delete the order')
+  const handleDelete = async (id: number) => {
+    const deleteOrderResponse = await deleteOrder(id);
+    if (deleteOrderResponse) {
+      alert('Sucessful deleted');
+      setOrders(orders.filter((order) => order.id !== id));
+    } else {
+      alert("We couldn't delete the order");
     }
   };
 
@@ -33,8 +33,10 @@ export default function Orders() {
   }, []);
 
   return (
-    <div>
-      <h1>My orders</h1>
+    <Box>
+      <Typography component="h1" variant="h4">
+        My orders
+      </Typography>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="table">
           <TableHead>
@@ -83,6 +85,6 @@ export default function Orders() {
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Box>
   );
 }

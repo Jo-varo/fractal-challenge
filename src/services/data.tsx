@@ -10,9 +10,7 @@ import {
 } from '../types/responses';
 import { getFormattedOrder } from '../helpers/format';
 
-const ENV_API_URL = 'https://fractal-challenge-backend.onrender.com'
-
-export const API_URL = `${ENV_API_URL}/api`;
+const API_URL = import.meta.env.VITE_API_URL
 
 export const getOrders = async (): Promise<Order[]> => {
   try {

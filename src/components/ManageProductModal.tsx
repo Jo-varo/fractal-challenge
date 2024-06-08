@@ -40,7 +40,7 @@ export default function ManageProductModal({
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
-      <Box component="form" onSubmit={handleAddNewProduct}>
+      <Box component="form" onSubmit={handleAddNewProduct} sx={{padding:'1rem'}}>
         <DialogTitle id="alert-dialog-title">
           {`${productModalData.productId ? 'Edit ' : 'Add new'}`} product
         </DialogTitle>
@@ -81,7 +81,7 @@ export default function ManageProductModal({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModal}>Discard</Button>
-          <Button autoFocus type="submit" variant="outlined">
+          <Button autoFocus type="submit" variant="contained">
             Confirm and save
           </Button>
         </DialogActions>

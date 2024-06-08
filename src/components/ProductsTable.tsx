@@ -66,8 +66,12 @@ export default function ProductsTable({
         </TableBody>
       </Table>
       {selectedProducts.length === 0 && (
-        <Typography variant="h6" component="p" sx={{ textAlign: 'center' }}>
-          Add some products to be shown here
+        <Typography
+          variant="h5"
+          component="p"
+          sx={{ textAlign: 'center', margin: '.5rem 0' }}
+        >
+          Add some products to be displayed here
         </Typography>
       )}
     </>

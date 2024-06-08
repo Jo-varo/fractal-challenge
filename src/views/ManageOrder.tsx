@@ -1,11 +1,7 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  Order,
-  Product,
-  SelectedProduct,
-} from '../types/types';
+import { Order, Product, SelectedProduct } from '../types/types';
 import ProductsTable from '../components/ProductsTable';
 import ManageProductModal from '../components/ManageProductModal';
 import {
@@ -189,53 +185,49 @@ export default function ManageOrder() {
   }, [id]);
 
   return (
-    <div>
-      <Typography variant="h3" component="h1">
+    <Box>
+      <Typography variant="h4" component="h1">
         {`${id ? 'Edit ' : 'Add '}`} Order
       </Typography>
-      <div>
+      <Box>
         <Box
           component="form"
-          sx={{
-            '& .MuiTextField-root': { m: 1, width: '25ch' },
-          }}
           noValidate
           autoComplete="off"
           onSubmit={handleSubmit}
         >
-          <TextField
-            required
-            name="order-no"
-            id="order-no"
-            label="Order #"
-            value={orderNo}
-            sx={{ display: 'block' }}
-          />
-          <TextField
-            sx={{ display: 'block' }}
-            disabled
-            name="date"
-            id="date"
-            label="Date"
-            value={getCurrentDate}
-          />
-          <TextField
-            sx={{ display: 'block' }}
-            disabled
-            name="no-products"
-            id="no-products"
-            label="# Products"
-            value={getTotalProducts}
-          />
-          <TextField
-            sx={{ display: 'block' }}
-            disabled
-            name="final-price"
-            id="final-price"
-            label="Final Price"
-            value={getFinalPrice}
-          />
-          <Button variant="outlined" type="button" onClick={handleOpenModal}>
+          <Box width={300} display="flex" flexDirection="column" gap="1.25rem" margin="1.5rem 0">
+            <TextField
+              required
+              name="order-no"
+              id="order-no"
+              label="Order #"
+              value={orderNo}
+            />
+            <TextField
+              disabled
+              name="date"
+              id="date"
+              label="Date"
+              value={getCurrentDate}
+            />
+            <TextField
+              disabled
+              name="no-products"
+              id="no-products"
+              label="# Products"
+              value={getTotalProducts}
+              sx={{width:'100% !important'}}
+            />
+            <TextField
+              disabled
+              name="final-price"
+              id="final-price"
+              label="Final Price"
+              value={getFinalPrice}
+            />
+          </Box>
+          <Button variant="outlined" type="button" onClick={handleOpenModal} sx={{margin:'0 0 .75rem'}} color='success'>
             Add new product
           </Button>
           <ProductsTable
@@ -243,11 +235,11 @@ export default function ManageOrder() {
             handleEditProduct={handleEditProduct}
             handleRemoveProduct={handleRemoveProduct}
           />
-          <Button variant="outlined" type="submit" sx={{ margin: '1rem 0' }}>
+          <Button variant="contained" type="submit" sx={{ margin: '1.25rem 0' }} size="large">
             {id ? 'Edit' : 'Create'} the order
           </Button>
         </Box>
-      </div>
+      </Box>
       <ManageProductModal
         handleAddNewProduct={handleAddNewProduct}
         handleCloseModal={handleCloseModal}
@@ -256,6 +248,6 @@ export default function ManageOrder() {
         productModalData={productModalData}
         products={products}
       />
-    </div>
+    </Box>
   );
 }
