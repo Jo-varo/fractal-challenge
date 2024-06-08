@@ -10,7 +10,9 @@ import {
 } from '../types/responses';
 import { getFormattedOrder } from '../helpers/format';
 
-export const API_URL = import.meta.env.VITE_API_URL;
+const ENV_API_URL = import.meta.env.VITE_API_URL
+
+export const API_URL = `${ENV_API_URL}/api`;
 
 export const getOrders = async (): Promise<Order[]> => {
   try {
