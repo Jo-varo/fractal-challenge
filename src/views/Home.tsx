@@ -32,7 +32,7 @@ export default function Home() {
           color="secondary"
           variant="contained"
         >
-          Manage orders
+          Add order
         </Button>
       </Box>
     </>

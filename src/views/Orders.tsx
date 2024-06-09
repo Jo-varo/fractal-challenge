@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { deleteOrder, getOrders } from '../services/data';
 import { Order } from '../types/types';
+import { formatDate } from '../helpers/format';
 
 export default function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -50,7 +51,7 @@ export default function Orders() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders.map((order) => (
+            {orders?.map((order) => (
               <TableRow
                 key={order.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -59,7 +60,7 @@ export default function Orders() {
                   {order.id}
                 </TableCell>
                 <TableCell>{order.orderNo}</TableCell>
-                <TableCell>{order.date}</TableCell>
+                <TableCell>{formatDate(new Date(order.date))}</TableCell>
                 <TableCell>{order.productsNo}</TableCell>
                 <TableCell>{order.finalPrice.toFixed(2)}</TableCell>
                 <TableCell sx={{ display: 'flex', gap: '.5rem' }}>
@@ -84,6 +85,15 @@ export default function Orders() {
             ))}
           </TableBody>
         </Table>
+        {orders.length === 0 && (
+          <Typography
+            variant="h5"
+            component="p"
+            sx={{ textAlign: 'center', margin: '.5rem 0' }}
+          >
+            There are no orders yet.
+          </Typography>
+        )}
       </TableContainer>
     </Box>
   );

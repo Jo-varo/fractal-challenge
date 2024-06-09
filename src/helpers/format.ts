@@ -11,3 +11,11 @@ export const getFormattedOrder = (order: OrderResponseItem) => ({
     unitPrice: Number(product.unitPrice),
   })),
 });
+
+export const formatPrice = (price: number) => {
+  return Math.round(price * 100) / 100;
+};
+
+export const formatDate = (date: Date) => {
+  return date.toLocaleDateString();
+};
