@@ -10,7 +10,7 @@ import {
 } from '../types/responses';
 import { getFormattedOrder } from '../helpers/format';
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const getOrders = async (): Promise<Order[]> => {
   try {
@@ -21,6 +21,7 @@ export const getOrders = async (): Promise<Order[]> => {
     );
     return mappedOrders;
   } catch (error) {
+    console.log(error);
     throw new Error('Error at getting orders');
   }
 };
@@ -48,7 +49,7 @@ export const getProducts = async (): Promise<Product[]> => {
     return mappedProducts;
   } catch (error) {
     console.log(error);
-    return [];
+    throw new Error('Error at getting orders');
   }
 };
 
@@ -74,7 +75,7 @@ export const editOrder = async (id: number, order: CreateOrderBody) => {
     return editOrderResponse;
   } catch (error) {
     console.log(error);
-    throw new Error('Error at creating');
+    throw new Error('Error at editing');
   }
 };
 
@@ -85,6 +86,6 @@ export const deleteOrder = async (id: number): Promise<DeleteOrderResponse> => {
     return deleteOrderResponse;
   } catch (error) {
     console.log(error);
-    throw new Error('Error at creating');
+    throw new Error('Error at deleting');
   }
 };
