@@ -1,38 +1,32 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Order, Product, SelectedProduct } from '../types/types';
+import { Order, SelectedProduct } from '../types/types';
 import ProductsTable from '../components/ProductsTable';
 import ManageProductModal from '../components/ManageProductModal';
-import {
-  createOrder,
-  editOrder,
-  getOrder,
-  getProducts,
-} from '../services/data';
-import { formatDate, formatPrice } from '../helpers/format';
+import { createOrder, editOrder, getOrder } from '../services/data';
+import { formatDate } from '../helpers/format';
+import useProducts from '../hooks/useProducts';
 
 export default function ManageOrder() {
   const { id } = useParams();
-  const [foundOrder, setFoundOrder] = useState<Order | null>(null);
-
-  const [isEditingProduct, setIsEditingProduct] = useState(false);
-  const [isOpenModal, setIsOpenModal] = useState(false);
-  const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>(
-    []
-  );
-
-  const [products, setProducts] = useState<Product[]>([]);
-
-  const initialProductModalData = {
-    productId: 0,
-    quantity: 0,
-  };
-  const [productModalData, setProductModalData] = useState(
-    initialProductModalData
-  );
-  const [orderNo, setOrderNo] = useState('');
   const navigate = useNavigate();
+
+  const [foundOrder, setFoundOrder] = useState<Order | null>(null);
+  const [orderNo, setOrderNo] = useState('');
+  const [isOpenModal, setIsOpenModal] = useState(false);
+
+  const {
+    products,
+    selectedProducts,
+    productModalData,
+    addNewProduct,
+    editProduct,
+    handleChangeProductData,
+    handleRemoveProduct,
+    resetModalState,
+    updateSelectedProducts,
+  } = useProducts();
 
   const getCurrentDate = foundOrder?.date
     ? new Date(foundOrder?.date)
@@ -61,7 +55,6 @@ export default function ManageOrder() {
     };
     if (id) {
       //Edit Path
-      console.log(dataToSubmit);
       const editedOrderResponse = await editOrder(Number(id), dataToSubmit);
       if (editedOrderResponse) {
         alert('Order edited');
@@ -83,101 +76,30 @@ export default function ManageOrder() {
 
   const handleAddNewProduct = (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    const data = new FormData(evt.currentTarget);
-    const product = products.find(
-      (product) => product.id === Number(data.get('product-id'))
-    );
-
-    if (!product) return;
-    if (Number(data.get('quantity')) === 0) return alert('Enter the quantity');
-
-    const newSelectedProduct: SelectedProduct = {
-      id: product.id,
-      name: product.name,
-      unitPrice: product.price,
-      quantity: Number(data.get('quantity')),
-      totalPrice: formatPrice(Number(data.get('quantity')) * product.price),
-    };
-
+    addNewProduct(new FormData(evt.currentTarget));
     handleCloseModal();
-
-    const alreadyAddedProduct = selectedProducts.find(
-      (product) => product.id === newSelectedProduct.id
-    );
-
-    if (alreadyAddedProduct) {
-      const newSelectedProducts = selectedProducts.map((product) => {
-        if (product.id === newSelectedProduct.id) {
-          return isEditingProduct
-            ? newSelectedProduct
-            : {
-                ...newSelectedProduct,
-                quantity: product.quantity + newSelectedProduct.quantity,
-                totalPrice: formatPrice(
-                  (product.quantity + newSelectedProduct.quantity) *
-                    product.unitPrice
-                ),
-              };
-        }
-        return product;
-      });
-      setIsEditingProduct(false);
-      setSelectedProducts(newSelectedProducts);
-      return;
-    }
-
-    setSelectedProducts([...selectedProducts, newSelectedProduct]);
-  };
-
-  const handleRemoveProduct = (id: number) => {
-    const filteredProducts = selectedProducts.filter(
-      (product) => product.id !== id
-    );
-    setSelectedProducts(filteredProducts);
   };
 
   const handleEditProduct = (product: SelectedProduct) => {
-    setIsEditingProduct(true);
-    setProductModalData({ productId: product.id, quantity: product.quantity });
+    editProduct(product);
     handleOpenModal();
-  };
-
-  const handleCloseModal = () => {
-    setIsEditingProduct(false);
-    setIsOpenModal(false);
-    setProductModalData(initialProductModalData);
   };
 
   const handleOpenModal = () => {
     setIsOpenModal(true);
   };
 
-  const handleChangeProductData = (
-    type: 'quantity' | 'product',
-    value: string | number
-  ) => {
-    if (type === 'quantity') {
-      setProductModalData({ ...productModalData, quantity: Number(value) });
-    }
-    if (type === 'product') {
-      setProductModalData({ ...productModalData, productId: Number(value) });
-    }
+  const handleCloseModal = () => {
+    setIsOpenModal(false);
+    resetModalState();
   };
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const productsData = await getProducts();
-      setProducts(productsData);
-    };
-    fetchProducts();
-  }, []);
 
   useEffect(() => {
     if (id) {
       const fetchOrder = async () => {
         const orderData = await getOrder(Number(id));
         setFoundOrder(orderData);
-        setSelectedProducts(orderData.selectedProducts);
+        updateSelectedProducts(orderData.selectedProducts);
         setOrderNo(orderData.orderNo);
       };
       fetchOrder();
